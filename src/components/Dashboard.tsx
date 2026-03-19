@@ -11,6 +11,7 @@ import {
 import { useTTS } from '../hooks/useTTS';
 import { useCaja } from '../context/CajaContext';
 import { motion } from 'framer-motion';
+import logo from './miCAJIAAA.png';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="text-center space-y-4 flex flex-col items-center">
         <img 
-          src="/src/components/miCAJIAAA.png" 
+          src={logo} 
           alt="MiCajita Logo" 
           className="w-24 h-24 object-contain mb-2"
         />

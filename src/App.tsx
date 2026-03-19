@@ -20,6 +20,7 @@ import Payments from './components/Payments';
 import Reports from './components/Reports';
 import Safe from './components/Safe';
 import { Vault, BookOpen } from 'lucide-react';
+import logo from './components/miCAJIAAA.png';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || '';
@@ -94,7 +95,7 @@ export default function App() {
               onClick={() => speakOnClick('Mi Cajita. Tu aplicación de gestión financiera comunitaria.', () => {})}
             >
               <img 
-                src="/src/components/miCAJIAAA.png" 
+                src={logo} 
                 alt="MiCajita Logo" 
                 className="w-10 h-10 object-contain"
               />

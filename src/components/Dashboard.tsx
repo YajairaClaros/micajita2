@@ -13,7 +13,7 @@ import {
 import { useTTS } from '../hooks/useTTS';
 import { useCaja } from '../context/CajaContext';
 import { motion } from 'framer-motion';
-import logo from './miCAJIAAA.png';
+const logo = 'https://lx8b6y7hds.ufs.sh/f/iXtDCTswv5eNF1qyDRdbzS2tTmcKBPH9XxyQi7Yadp36wlA1';
 import { getBreakdownSpeech } from '../utils/moneyUtils';
 
 export default function Dashboard() {

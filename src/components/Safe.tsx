@@ -63,6 +63,7 @@ export default function Safe() {
   
   // Calculator State
   const [calcTotal, setCalcTotal] = useState<number>(0);
+  const [calcHistory, setCalcHistory] = useState<number[]>([]);
   const [calcMode, setCalcMode] = useState<'money' | 'numeric'>('money');
   const [numericValue, setNumericValue] = useState<string>('');
   
@@ -73,11 +74,24 @@ export default function Safe() {
 
   const addCalcAmount = (val: number, label: string) => {
     setCalcTotal(prev => parseFloat((prev + val).toFixed(2)));
+    setCalcHistory(prev => [...prev, val]);
     speak(`Sumando ${label}. Total actual: ${calcTotal + val} pesos`);
+  };
+
+  const undoLastAmount = () => {
+    if (calcHistory.length === 0) {
+      speak('No hay montos para borrar');
+      return;
+    }
+    const lastVal = calcHistory[calcHistory.length - 1];
+    setCalcTotal(prev => parseFloat((prev - lastVal).toFixed(2)));
+    setCalcHistory(prev => prev.slice(0, -1));
+    speak(`Borrando último ingreso de ${lastVal} pesos. Total actual: ${calcTotal - lastVal} pesos`);
   };
 
   const clearCalc = () => {
     setCalcTotal(0);
+    setCalcHistory([]);
     setNumericValue('');
     setStep('calc');
     setSelectedType(null);
@@ -215,6 +229,14 @@ export default function Safe() {
           <h4 className="text-6xl font-black text-white tracking-tighter relative z-10">
             ${calcTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
           </h4>
+          {calcMode === 'money' && calcHistory.length > 0 && (
+            <button
+              onClick={() => speakOnClick('Borrar último ingreso', undoLastAmount)}
+              className="absolute top-4 right-4 p-2 bg-red-500/20 text-red-400 hover:bg-red-500/40 rounded-xl transition-all z-20"
+            >
+              <Delete size={20} />
+            </button>
+          )}
         </motion.div>
 
         {/* Flujo de Pasos */}

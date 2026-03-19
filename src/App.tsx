@@ -23,7 +23,7 @@ import Payments from './components/Payments';
 import Reports from './components/Reports';
 import Safe from './components/Safe';
 import { Vault, BookOpen } from 'lucide-react';
-import logo from './components/miCAJIAAA.png';
+const logo = 'https://lx8b6y7hds.ufs.sh/f/iXtDCTswv5eNF1qyDRdbzS2tTmcKBPH9XxyQi7Yadp36wlA1';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';

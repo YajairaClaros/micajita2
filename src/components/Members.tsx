@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MOCK_MIEMBROS, Miembro } from '../data/mockData';
 import { useTTS } from '../hooks/useTTS';
-import { UserPlus, Volume2, Trash2, CheckCircle2, XCircle } from 'lucide-react';
+import { UserPlus, Volume2, Trash2, CheckCircle2, XCircle, Camera, RefreshCw, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Members() {
@@ -20,6 +20,52 @@ export default function Members() {
   });
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const { speak, speakOnClick } = useTTS();
+
+  // Camera State
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const startCamera = async () => {
+    try {
+      setIsCameraActive(true);
+      speak('Iniciando cámara');
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      console.error("Error accessing camera:", err);
+      setIsCameraActive(false);
+      speak('Error al acceder a la cámara. Por favor, verifica los permisos.');
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    setIsCameraActive(false);
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+      if (context) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const photoData = canvas.toDataURL('image/jpeg');
+        setNewMember({ ...newMember, foto: photoData });
+        stopCamera();
+        speak('Foto capturada con éxito');
+      }
+    }
+  };
 
   useEffect(() => {
     fetchMembers();
@@ -61,9 +107,14 @@ export default function Members() {
       referido_por: ''
     });
     setShowForm(false);
+    stopCamera();
     
     setTimeout(() => setStatus(null), 3000);
   }
+
+  useEffect(() => {
+    return () => stopCamera();
+  }, []);
 
   const handleListen = (m: Miembro) => {
     const referrer = m.referido_por ? miembros.find(mem => mem.id === m.referido_por)?.nombre : null;
@@ -179,15 +230,63 @@ export default function Members() {
                   ))}
                 </select>
               </div>
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">URL de Foto (Opcional)</label>
-                <input
-                  type="url"
-                  value={newMember.foto}
-                  onChange={(e) => setNewMember({ ...newMember, foto: e.target.value })}
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-                  placeholder="https://ejemplo.com/foto.jpg"
-                />
+              <div className="space-y-2 col-span-full">
+                <label className="text-sm font-medium text-gray-700">Foto del Miembro</label>
+                <div className="flex flex-col items-center gap-4 p-6 bg-gray-50 border-2 border-dashed border-gray-200 rounded-[2rem]">
+                  {newMember.foto ? (
+                    <div className="relative group">
+                      <img 
+                        src={newMember.foto} 
+                        alt="Preview" 
+                        className="w-32 h-32 rounded-3xl object-cover border-4 border-white shadow-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => speakOnClick('Tomar otra foto', startCamera)}
+                        className="absolute -bottom-2 -right-2 p-2 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 transition-colors"
+                      >
+                        <RefreshCw size={16} />
+                      </button>
+                    </div>
+                  ) : isCameraActive ? (
+                    <div className="relative w-full max-w-xs aspect-square bg-black rounded-3xl overflow-hidden shadow-xl">
+                      <video 
+                        ref={videoRef} 
+                        autoPlay 
+                        playsInline 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-4">
+                        <button
+                          type="button"
+                          onClick={() => speakOnClick('Capturar foto', capturePhoto)}
+                          className="p-4 bg-white text-blue-600 rounded-full shadow-xl hover:scale-110 active:scale-95 transition-all"
+                        >
+                          <Camera size={24} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => speakOnClick('Cancelar cámara', stopCamera)}
+                          className="p-4 bg-red-500 text-white rounded-full shadow-xl hover:scale-110 active:scale-95 transition-all"
+                        >
+                          <XCircle size={24} />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => speakOnClick('Abrir cámara', startCamera)}
+                      className="flex flex-col items-center gap-2 text-gray-400 hover:text-blue-600 transition-colors"
+                    >
+                      <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+                        <Camera size={32} />
+                      </div>
+                      <span className="text-xs font-bold uppercase tracking-widest">Tocar para tomar foto</span>
+                    </button>
+                  )}
+                  <canvas ref={canvasRef} className="hidden" />
+                </div>
               </div>
               <div className="flex items-center gap-3 pt-6">
                 <input

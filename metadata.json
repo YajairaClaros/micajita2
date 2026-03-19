@@ -1,5 +1,5 @@
 {
   "name": "MiCajita",
   "description": "Gestión de miembros, reuniones, asistencias y pagos con interfaz icon-first y TTS para accesibilidad.",
-  "requestFramePermissions": []
+  "requestFramePermissions": ["camera"]
 }

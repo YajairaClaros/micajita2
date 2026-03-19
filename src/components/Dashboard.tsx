@@ -6,12 +6,15 @@ import {
   CreditCard, 
   BarChart3,
   Vault,
-  BookOpen
+  BookOpen,
+  Volume2,
+  Banknote
 } from 'lucide-react';
 import { useTTS } from '../hooks/useTTS';
 import { useCaja } from '../context/CajaContext';
 import { motion } from 'framer-motion';
 import logo from './miCAJIAAA.png';
+import { getBreakdownSpeech } from '../utils/moneyUtils';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -50,20 +53,28 @@ export default function Dashboard() {
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-slate-900 text-white p-8 rounded-[3rem] shadow-2xl relative overflow-hidden group"
+        onClick={() => speakOnClick('Escuchar desglose de balance', () => speak(getBreakdownSpeech(balance)))}
+        className="bg-slate-900 text-white p-8 rounded-[3rem] shadow-2xl relative overflow-hidden group cursor-pointer"
       >
         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
           <Vault size={120} />
+        </div>
+        <div className="absolute top-4 right-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Volume2 size={20} />
         </div>
         <div className="relative z-10">
           <p className="text-blue-400 font-bold uppercase tracking-[0.2em] text-xs mb-2">Balance Total en Caja</p>
           <h3 className="text-5xl font-black tracking-tighter">
             ${balance.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
           </h3>
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex gap-2 items-center">
             <span className="px-3 py-1 bg-white/10 rounded-full text-[10px] font-bold uppercase tracking-wider">
               Actualizado ahora
             </span>
+            <div className="flex items-center gap-1 text-[10px] text-blue-400 font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity">
+              <Banknote size={12} />
+              <span>Escuchar desglose</span>
+            </div>
           </div>
         </div>
       </motion.div>

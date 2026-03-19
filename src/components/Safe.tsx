@@ -12,6 +12,7 @@ import {
   Calculator as CalcIcon,
   Coins,
   Banknote,
+  Volume2,
   Delete,
   ArrowLeftRight,
   Utensils,
@@ -26,6 +27,7 @@ import { useCaja } from '../context/CajaContext';
 import { useTTS } from '../hooks/useTTS';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { getBreakdownSpeech } from '../utils/moneyUtils';
 
 interface Denomination {
   value: number;
@@ -35,17 +37,17 @@ interface Denomination {
 }
 
 const DENOMINATIONS: Denomination[] = [
-  { value: 0.01, label: '1¢ Centavo', type: 'coin', color: 'bg-amber-700' },
-  { value: 0.05, label: '5¢ Cinco centavos', type: 'coin', color: 'bg-gray-400' },
-  { value: 0.10, label: '10¢ Diez centavos', type: 'coin', color: 'bg-gray-400' },
-  { value: 0.25, label: '25¢ Quarter', type: 'coin', color: 'bg-gray-400' },
+  { value: 0.5, label: '50¢ Moneda', type: 'coin', color: 'bg-amber-700' },
   { value: 1, label: '$1 Moneda', type: 'coin', color: 'bg-yellow-500' },
-  { value: 1, label: '$1 Billete', type: 'bill', color: 'bg-emerald-500' },
-  { value: 5, label: '$5 Billete', type: 'bill', color: 'bg-emerald-600' },
-  { value: 10, label: '$10 Billete', type: 'bill', color: 'bg-emerald-700' },
-  { value: 20, label: '$20 Billete', type: 'bill', color: 'bg-green-800' },
-  { value: 50, label: '$50 Billete', type: 'bill', color: 'bg-amber-600' },
-  { value: 100, label: '$100 Billete', type: 'bill', color: 'bg-orange-800' },
+  { value: 2, label: '$2 Moneda', type: 'coin', color: 'bg-yellow-600' },
+  { value: 5, label: '$5 Moneda', type: 'coin', color: 'bg-yellow-700' },
+  { value: 10, label: '$10 Moneda', type: 'coin', color: 'bg-yellow-800' },
+  { value: 20, label: '$20 Billete', type: 'bill', color: 'bg-blue-500' },
+  { value: 50, label: '$50 Billete', type: 'bill', color: 'bg-pink-500' },
+  { value: 100, label: '$100 Billete', type: 'bill', color: 'bg-red-500' },
+  { value: 200, label: '$200 Billete', type: 'bill', color: 'bg-green-500' },
+  { value: 500, label: '$500 Billete', type: 'bill', color: 'bg-orange-900' },
+  { value: 1000, label: '$1000 Billete', type: 'bill', color: 'bg-purple-900' },
 ];
 
 const CATEGORIES = [
@@ -116,6 +118,10 @@ export default function Safe() {
     clearCalc();
   };
 
+  const speakBalanceBreakdown = () => {
+    speak(getBreakdownSpeech(balance));
+  };
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
       <div className="flex justify-between items-center">
@@ -136,12 +142,20 @@ export default function Safe() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <motion.div 
           whileHover={{ y: -5 }}
-          className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 text-center"
+          className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 text-center relative group cursor-pointer"
+          onClick={() => speakOnClick('Escuchar desglose de balance', speakBalanceBreakdown)}
         >
+          <div className="absolute top-4 right-4 text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Volume2 size={16} />
+          </div>
           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Balance Total</p>
           <h3 className={`text-4xl font-black ${balance >= 0 ? 'text-gray-900' : 'text-red-600'}`}>
             ${balance.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
           </h3>
+          <div className="mt-2 flex items-center justify-center gap-1 text-[10px] text-blue-600 font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity">
+            <Banknote size={12} />
+            <span>Escuchar desglose</span>
+          </div>
         </motion.div>
 
         <motion.div 

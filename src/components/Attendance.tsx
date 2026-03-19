@@ -27,6 +27,7 @@ export default function Attendance() {
 
   async function fetchInitialData() {
     setLoading(true);
+    speak('Cargando datos para asistencia');
     // Simulamos carga
     setTimeout(() => {
       setMiembros(MOCK_MIEMBROS.filter(m => m.activo));
@@ -35,6 +36,7 @@ export default function Attendance() {
         setSelectedReunion(MOCK_REUNIONES[0].id);
       }
       setLoading(false);
+      speak('Datos cargados correctamente');
     }, 500);
   }
 

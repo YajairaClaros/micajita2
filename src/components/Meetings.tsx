@@ -20,10 +20,12 @@ export default function Meetings() {
 
   async function fetchMeetings() {
     setLoading(true);
+    speak('Cargando lista de reuniones');
     // Simulamos carga
     setTimeout(() => {
       setReuniones(MOCK_REUNIONES);
       setLoading(false);
+      speak(`Se han cargado ${MOCK_REUNIONES.length} reuniones`);
     }, 500);
   }
 

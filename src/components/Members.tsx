@@ -18,10 +18,12 @@ export default function Members() {
 
   async function fetchMembers() {
     setLoading(true);
+    speak('Cargando lista de miembros');
     // Simulamos carga
     setTimeout(() => {
       setMiembros(MOCK_MIEMBROS);
       setLoading(false);
+      speak(`Se han cargado ${MOCK_MIEMBROS.length} miembros`);
     }, 500);
   }
 
@@ -46,6 +48,11 @@ export default function Members() {
 
   const handleListen = (m: Miembro) => {
     speak(`${m.nombre}. Teléfono: ${m.telefono || 'No disponible'}. Estado: ${m.activo ? 'Activo' : 'Inactivo'}`);
+  };
+
+  const handleDelete = (m: Miembro) => {
+    setMiembros(miembros.filter(member => member.id !== m.id));
+    speak(`Miembro ${m.nombre} eliminado de la lista local`);
   };
 
   return (
@@ -209,6 +216,7 @@ export default function Members() {
                   <Volume2 size={20} />
                 </button>
                 <button
+                  onClick={() => handleDelete(m)}
                   className="p-3 text-red-600 bg-red-50 hover:bg-red-100 rounded-2xl transition-colors opacity-0 group-hover:opacity-100"
                   title="Eliminar"
                 >

@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { 
   Users, 
   Calendar, 
@@ -27,20 +27,30 @@ const hasValidSupabase = Boolean(SUPABASE_URL) && Boolean(SUPABASE_ANON_KEY);
 function Navigation() {
   const location = useLocation();
   const { speak } = useTTS();
+  const isFirstMount = useRef(true);
 
   const navItems = [
-    { path: '/', label: 'Inicio', icon: Home },
-    { path: '/miembros', label: 'Miembros', icon: Users },
-    { path: '/reuniones', label: 'Reuniones', icon: Calendar },
-    { path: '/asistencias', label: 'Asistencia', icon: CheckSquare },
-    { path: '/pagos', label: 'Pagos', icon: CreditCard },
-    { path: '/reportes', label: 'Reportes', icon: BarChart3 },
-    { path: '/caja-fuerte', label: 'Caja & Calc', icon: Vault },
+    { path: '/', label: 'Inicio', icon: Home, description: 'Pantalla principal' },
+    { path: '/miembros', label: 'Miembros', icon: Users, description: 'Gestionar personas' },
+    { path: '/reuniones', label: 'Reuniones', icon: Calendar, description: 'Actividades y eventos' },
+    { path: '/asistencias', label: 'Asistencia', icon: CheckSquare, description: 'Pasar lista' },
+    { path: '/pagos', label: 'Pagos', icon: CreditCard, description: 'Cuotas y donaciones' },
+    { path: '/reportes', label: 'Reportes', icon: BarChart3, description: 'Ver resultados' },
+    { path: '/caja-fuerte', label: 'Caja & Calc', icon: Vault, description: 'Balance y cuentas' },
   ];
 
-  const handleNavClick = (label: string) => {
-    speak(`Navegando a ${label}`);
-  };
+  useEffect(() => {
+    // Announce page change
+    const item = navItems.find(i => i.path === location.pathname);
+    if (item) {
+      if (isFirstMount.current) {
+        speak(`Bienvenido a MiCajita. Estás en: ${item.label}. ${item.description}`);
+        isFirstMount.current = false;
+      } else {
+        speak(`Estás en: ${item.label}. ${item.description}`);
+      }
+    }
+  }, [location.pathname]);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-200 px-2 py-2 flex justify-around items-center z-50 md:top-0 md:bottom-auto md:flex-col md:w-24 md:h-full md:border-r md:border-t-0 md:justify-start md:pt-8 md:gap-4">
@@ -51,7 +61,6 @@ function Navigation() {
           <Link
             key={item.path}
             to={item.path}
-            onClick={() => handleNavClick(item.label)}
             className={`flex flex-col items-center p-2 rounded-2xl transition-all duration-200 ${
               isActive 
                 ? 'text-blue-600 bg-blue-50 shadow-sm scale-105' 

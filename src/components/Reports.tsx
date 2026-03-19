@@ -34,6 +34,7 @@ export default function Reports() {
 
   async function fetchReports() {
     setLoading(true);
+    speak('Generando reportes financieros y de asistencia');
     
     // Simulamos carga
     setTimeout(() => {
@@ -66,6 +67,7 @@ export default function Reports() {
       setAsistenciaReportes(formatted);
 
       setLoading(false);
+      speak('Reportes generados correctamente');
     }, 500);
   }
 

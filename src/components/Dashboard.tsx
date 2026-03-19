@@ -26,7 +26,6 @@ export default function Dashboard() {
   ];
 
   const handleCardClick = (item: typeof menuItems[0]) => {
-    speak(`Abriendo ${item.label}. ${item.description}`);
     navigate(item.path);
   };
 

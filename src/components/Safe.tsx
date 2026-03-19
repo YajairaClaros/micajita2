@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Vault, 
   TrendingUp, 
@@ -57,7 +57,7 @@ const CATEGORIES = [
 
 export default function Safe() {
   const { balance, totalIncome, totalExpenses, transactions, addTransaction, clearHistory } = useCaja();
-  const { speak } = useTTS();
+  const { speak, speakOnClick } = useTTS();
   
   // Calculator State
   const [calcTotal, setCalcTotal] = useState<number>(0);
@@ -124,10 +124,7 @@ export default function Safe() {
           Caja Fuerte
         </h2>
         <button 
-          onClick={() => {
-            clearHistory();
-            speak('Historial de caja vaciado');
-          }}
+          onClick={() => speakOnClick('Vaciar historial de caja', clearHistory)}
           className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-colors"
           title="Vaciar historial"
         >
@@ -187,7 +184,7 @@ export default function Safe() {
             </div>
           </div>
           <button 
-            onClick={clearCalc}
+            onClick={() => speakOnClick('Reiniciar calculadora', clearCalc)}
             className="p-3 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all"
           >
             <RotateCcw size={20} />
@@ -218,10 +215,7 @@ export default function Safe() {
             >
               <div className="flex gap-2">
                 <button
-                  onClick={() => {
-                    setCalcMode(calcMode === 'money' ? 'numeric' : 'money');
-                    speak(`Cambiando a modo ${calcMode === 'money' ? 'teclado numérico' : 'conteo de dinero'}`);
-                  }}
+                  onClick={() => speakOnClick(`Cambiando a modo ${calcMode === 'money' ? 'teclado numérico' : 'conteo de dinero'}`, () => setCalcMode(calcMode === 'money' ? 'numeric' : 'money'))}
                   className="flex-1 py-4 bg-gray-100 rounded-3xl text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-3 hover:bg-gray-200 transition-colors"
                 >
                   <ArrowLeftRight size={18} />
@@ -234,7 +228,7 @@ export default function Safe() {
                   {DENOMINATIONS.map((d, i) => (
                     <button
                       key={i}
-                      onClick={() => addCalcAmount(d.value, d.label)}
+                      onClick={() => speakOnClick(`Sumar ${d.label}`, () => addCalcAmount(d.value, d.label))}
                       className="bg-gray-50 p-4 rounded-3xl border border-gray-100 flex flex-col items-center gap-2 hover:bg-blue-50 hover:border-blue-200 transition-all active:scale-90"
                     >
                       <div className={`w-12 h-12 rounded-full ${d.color} flex items-center justify-center text-white shadow-md`}>
@@ -249,13 +243,13 @@ export default function Safe() {
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, '.', 0].map((n) => (
                     <button
                       key={n}
-                      onClick={() => handleNumericInput(n.toString())}
+                      onClick={() => speakOnClick(`Número ${n}`, () => handleNumericInput(n.toString()))}
                       className="h-16 bg-gray-50 rounded-3xl text-2xl font-black text-gray-900 hover:bg-blue-50 hover:border-blue-200 border border-transparent transition-all active:scale-90"
                     >
                       {n}
                     </button>
                   ))}
-                  <button onClick={backspace} className="h-16 bg-red-50 text-red-600 rounded-3xl flex items-center justify-center hover:bg-red-100 transition-all active:scale-90">
+                  <button onClick={() => speakOnClick('Borrar último dígito', backspace)} className="h-16 bg-red-50 text-red-600 rounded-3xl flex items-center justify-center hover:bg-red-100 transition-all active:scale-90">
                     <Delete size={24} />
                   </button>
                 </div>
@@ -263,7 +257,7 @@ export default function Safe() {
 
               <div className="pt-4 flex gap-4">
                 <button
-                  onClick={() => handleTypeSelect('income')}
+                  onClick={() => speakOnClick('Registrar como ingreso', () => handleTypeSelect('income'))}
                   disabled={calcTotal <= 0}
                   className={`flex-1 py-6 rounded-[2rem] font-black text-xl flex flex-col items-center gap-2 transition-all shadow-lg ${
                     calcTotal > 0 ? 'bg-emerald-600 text-white shadow-emerald-600/20 hover:scale-105 active:scale-95' : 'bg-gray-100 text-gray-300'
@@ -273,7 +267,7 @@ export default function Safe() {
                   <span>INGRESO</span>
                 </button>
                 <button
-                  onClick={() => handleTypeSelect('expense')}
+                  onClick={() => speakOnClick('Registrar como egreso', () => handleTypeSelect('expense'))}
                   disabled={calcTotal <= 0}
                   className={`flex-1 py-6 rounded-[2rem] font-black text-xl flex flex-col items-center gap-2 transition-all shadow-lg ${
                     calcTotal > 0 ? 'bg-red-600 text-white shadow-red-600/20 hover:scale-105 active:scale-95' : 'bg-gray-100 text-gray-300'
@@ -307,7 +301,7 @@ export default function Safe() {
                   return (
                     <button
                       key={cat.id}
-                      onClick={() => handleCategorySelect(cat.id, cat.label)}
+                      onClick={() => speakOnClick(`Categoría ${cat.label}`, () => handleCategorySelect(cat.id, cat.label))}
                       className={`p-8 rounded-[2.5rem] flex flex-col items-center gap-4 transition-all hover:scale-105 active:scale-95 shadow-md ${cat.color}`}
                     >
                       <Icon size={48} />
@@ -318,10 +312,7 @@ export default function Safe() {
               </div>
 
               <button
-                onClick={() => {
-                  setStep('calc');
-                  speak('Volviendo a la calculadora');
-                }}
+                onClick={() => speakOnClick('Volver a la calculadora', () => setStep('calc'))}
                 className="w-full py-4 bg-gray-100 text-gray-500 rounded-3xl font-bold uppercase tracking-widest flex items-center justify-center gap-2"
               >
                 <X size={20} />

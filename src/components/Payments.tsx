@@ -22,7 +22,7 @@ import {
   X,
   ChevronDown
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -76,7 +76,7 @@ export default function Payments() {
   const [selectedReunion, setSelectedReunion] = useState<string>('');
   
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-  const { speak } = useTTS();
+  const { speak, speakOnClick } = useTTS();
   const { addTransaction } = useCaja();
 
   useEffect(() => {
@@ -213,10 +213,9 @@ export default function Payments() {
         </h2>
         <button
           onClick={() => {
-            if (showForm) resetForm();
+            if (showForm) speakOnClick('Cancelando registro de pago', () => resetForm());
             else {
-              setShowForm(true);
-              speak('Abriendo formulario para nuevo pago. Selecciona un miembro.');
+              speakOnClick('Abriendo formulario para nuevo pago. Selecciona un miembro.', () => setShowForm(true));
             }
           }}
           className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg ${
@@ -236,10 +235,9 @@ export default function Payments() {
           <select
             value={filterReunion}
             onChange={(e) => {
-              setFilterReunion(e.target.value);
               const r = reuniones.find(r => r.id === e.target.value);
               const dateStr = r ? `, del ${format(new Date(r.fecha), "d 'de' MMMM", { locale: es })}` : '';
-              speak(`Filtrando por: ${r ? r.titulo : 'Todas las reuniones'}${dateStr}`);
+              speakOnClick(`Filtrando por: ${r ? r.titulo : 'Todas las reuniones'}${dateStr}`, () => setFilterReunion(e.target.value));
             }}
             className="bg-transparent border-none outline-none font-bold text-gray-700 pr-8 min-w-[200px] uppercase tracking-widest text-xs"
           >
@@ -307,7 +305,7 @@ export default function Payments() {
                     {miembros.map(m => (
                       <button
                         key={m.id}
-                        onClick={() => handleMemberSelect(m)}
+                        onClick={() => speakOnClick(`Seleccionado ${m.nombre}`, () => handleMemberSelect(m))}
                         className="group flex flex-col items-center gap-3 p-4 rounded-[2.5rem] hover:bg-orange-50 transition-all active:scale-95 border border-transparent hover:border-orange-200"
                       >
                         <div className="relative">
@@ -352,7 +350,7 @@ export default function Payments() {
 
                   <div className="flex gap-2">
                     <button
-                      onClick={() => setCalcMode(calcMode === 'money' ? 'numeric' : 'money')}
+                      onClick={() => speakOnClick(calcMode === 'money' ? 'Cambiando a teclado numérico' : 'Cambiando a monedas', () => setCalcMode(calcMode === 'money' ? 'numeric' : 'money'))}
                       className="flex-1 py-4 bg-gray-100 rounded-3xl text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-3 hover:bg-gray-200 transition-colors"
                     >
                       <ArrowLeftRight size={18} />
@@ -365,7 +363,7 @@ export default function Payments() {
                       {DENOMINATIONS.map((d, i) => (
                         <button
                           key={i}
-                          onClick={() => addCalcAmount(d.value, d.label)}
+                          onClick={() => speakOnClick(`Sumando ${d.label}`, () => addCalcAmount(d.value, d.label))}
                           className="bg-gray-50 p-4 rounded-3xl border border-gray-100 flex flex-col items-center gap-2 hover:bg-orange-50 hover:border-orange-200 transition-all active:scale-90"
                         >
                           <div className={`w-12 h-12 rounded-full ${d.color} flex items-center justify-center text-white shadow-md`}>
@@ -380,13 +378,13 @@ export default function Payments() {
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9, '.', 0].map((n) => (
                         <button
                           key={n}
-                          onClick={() => handleNumericInput(n.toString())}
+                          onClick={() => speakOnClick(`Número ${n}`, () => handleNumericInput(n.toString()))}
                           className="h-16 bg-gray-50 rounded-3xl text-2xl font-black text-gray-900 hover:bg-orange-50 hover:border-orange-200 border border-transparent transition-all active:scale-90"
                         >
                           {n}
                         </button>
                       ))}
-                      <button onClick={backspace} className="h-16 bg-red-50 text-red-600 rounded-3xl flex items-center justify-center hover:bg-red-100 transition-all active:scale-90">
+                      <button onClick={() => speakOnClick('Borrar último dígito', backspace)} className="h-16 bg-red-50 text-red-600 rounded-3xl flex items-center justify-center hover:bg-red-100 transition-all active:scale-90">
                         <Delete size={24} />
                       </button>
                     </div>
@@ -394,14 +392,14 @@ export default function Payments() {
 
                   <div className="flex gap-4">
                     <button
-                      onClick={() => setStep('member')}
+                      onClick={() => speakOnClick('Volver a selección de miembro', () => setStep('member'))}
                       className="flex-1 py-4 bg-gray-100 text-gray-500 rounded-3xl font-bold uppercase tracking-widest flex items-center justify-center gap-2"
                     >
                       <X size={20} />
                       Atrás
                     </button>
                     <button
-                      onClick={handleCalcConfirm}
+                      onClick={() => speakOnClick(`Confirmar monto de ${calcTotal} pesos`, handleCalcConfirm)}
                       disabled={calcTotal <= 0}
                       className={`flex-[2] py-4 rounded-3xl font-black text-xl flex items-center justify-center gap-3 transition-all shadow-lg ${
                         calcTotal > 0 ? 'bg-orange-600 text-white shadow-orange-600/20 hover:scale-105 active:scale-95' : 'bg-gray-100 text-gray-300'
@@ -433,7 +431,7 @@ export default function Payments() {
                       return (
                         <button
                           key={type.id}
-                          onClick={() => handleTypeSelect(type.id as any)}
+                          onClick={() => speakOnClick(`Seleccionado tipo ${type.label}`, () => handleTypeSelect(type.id as any))}
                           className={`p-10 rounded-[3rem] flex flex-col items-center gap-4 transition-all hover:scale-105 active:scale-95 shadow-md ${type.color}`}
                         >
                           <Icon size={64} />
@@ -444,7 +442,7 @@ export default function Payments() {
                   </div>
 
                   <button
-                    onClick={() => setStep('calc')}
+                    onClick={() => speakOnClick('Volver a ingresar monto', () => setStep('calc'))}
                     className="w-full py-4 bg-gray-100 text-gray-500 rounded-3xl font-bold uppercase tracking-widest flex items-center justify-center gap-2"
                   >
                     <X size={20} />
@@ -468,10 +466,7 @@ export default function Payments() {
 
                   <div className="grid grid-cols-1 gap-3">
                     <button
-                      onClick={() => {
-                        setSelectedReunion('');
-                        speak('Sin reunión específica seleccionada');
-                      }}
+                      onClick={() => speakOnClick('Sin reunión específica seleccionada', () => setSelectedReunion(''))}
                       className={`p-6 rounded-3xl border-2 transition-all flex items-center justify-between ${
                         selectedReunion === '' ? 'border-orange-600 bg-orange-50' : 'border-gray-100 bg-white'
                       }`}
@@ -482,10 +477,7 @@ export default function Payments() {
                     {reuniones.map(r => (
                       <button
                         key={r.id}
-                        onClick={() => {
-                          setSelectedReunion(r.id);
-                          speak(`Seleccionada reunión: ${r.titulo}, del ${format(new Date(r.fecha), "d 'de' MMMM", { locale: es })}`);
-                        }}
+                        onClick={() => speakOnClick(`Seleccionada reunión: ${r.titulo}, del ${format(new Date(r.fecha), "d 'de' MMMM", { locale: es })}`, () => setSelectedReunion(r.id))}
                         className={`p-6 rounded-3xl border-2 transition-all flex items-center justify-between ${
                           selectedReunion === r.id ? 'border-orange-600 bg-orange-50' : 'border-gray-100 bg-white'
                         }`}
@@ -501,14 +493,14 @@ export default function Payments() {
 
                   <div className="flex gap-4 pt-4">
                     <button
-                      onClick={() => setStep('type')}
+                      onClick={() => speakOnClick('Volver a selección de tipo de pago', () => setStep('type'))}
                       className="flex-1 py-4 bg-gray-100 text-gray-500 rounded-3xl font-bold uppercase tracking-widest flex items-center justify-center gap-2"
                     >
                       <X size={20} />
                       Atrás
                     </button>
                     <button
-                      onClick={handleFinalSubmit}
+                      onClick={() => speakOnClick('Guardando registro de pago', handleFinalSubmit)}
                       className="flex-[2] py-6 bg-emerald-600 text-white rounded-[2rem] font-black text-2xl shadow-lg shadow-emerald-600/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3"
                     >
                       <CheckCircle2 size={32} />
@@ -554,7 +546,7 @@ export default function Payments() {
                       </div>
                     </div>
                     <button
-                      onClick={() => handleListen(p)}
+                      onClick={() => speakOnClick(`Escuchar detalles del pago de ${p.miembros.nombre}`, () => handleListen(p))}
                       className="p-3 text-orange-600 bg-orange-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <Volume2 size={20} />

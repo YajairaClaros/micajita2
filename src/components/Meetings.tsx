@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MOCK_REUNIONES, Reunion } from '../data/mockData';
 import { useTTS } from '../hooks/useTTS';
 import { Calendar, Volume2, CheckCircle2, XCircle, Clock } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -12,7 +12,7 @@ export default function Meetings() {
   const [showForm, setShowForm] = useState(false);
   const [newMeeting, setNewMeeting] = useState({ titulo: '', fecha: '', hora: '', descripcion: '' });
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-  const { speak } = useTTS();
+  const { speak, speakOnClick } = useTTS();
 
   useEffect(() => {
     fetchMeetings();
@@ -57,10 +57,7 @@ export default function Meetings() {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">Reuniones</h2>
         <button
-          onClick={() => {
-            setShowForm(!showForm);
-            speak(showForm ? 'Cerrando formulario' : 'Abriendo formulario para nueva reunión');
-          }}
+          onClick={() => speakOnClick(showForm ? 'Cerrando formulario' : 'Abriendo formulario para nueva reunión', () => setShowForm(!showForm))}
           className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-purple-700 transition-colors"
         >
           <Calendar size={20} />
@@ -137,13 +134,14 @@ export default function Meetings() {
             <div className="flex justify-end gap-3 pt-4">
               <button
                 type="button"
-                onClick={() => setShowForm(false)}
+                onClick={() => speakOnClick('Cancelar creación de reunión', () => setShowForm(false))}
                 className="px-6 py-2 text-gray-500 font-medium hover:bg-gray-50 rounded-xl"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
+                onClick={() => speak('Guardando reunión')}
                 className="px-6 py-2 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700"
               >
                 Guardar Reunión
@@ -161,7 +159,11 @@ export default function Meetings() {
         ) : (
           <div className="divide-y divide-gray-100">
             {reuniones.map((r) => (
-              <div key={r.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+              <div 
+                key={r.id} 
+                onClick={() => speakOnClick(`Escuchar detalles de ${r.titulo}`, () => handleListen(r))}
+                className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer"
+              >
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-2xl flex flex-col items-center justify-center font-bold">
                     <span className="text-xs uppercase">{format(new Date(r.fecha), 'MMM', { locale: es })}</span>
@@ -177,7 +179,10 @@ export default function Meetings() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => handleListen(r)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      speakOnClick(`Escuchar detalles de ${r.titulo}`, () => handleListen(r));
+                    }}
                     className="p-2 text-purple-600 hover:bg-purple-50 rounded-xl transition-colors"
                     title="Escuchar"
                   >

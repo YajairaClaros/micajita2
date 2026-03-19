@@ -13,12 +13,13 @@ import { useTTS } from './hooks/useTTS';
 import { CajaProvider } from './context/CajaContext';
 import Dashboard from './components/Dashboard';
 import Members from './components/Members';
+import Directory from './components/Directory';
 import Meetings from './components/Meetings';
 import Attendance from './components/Attendance';
 import Payments from './components/Payments';
 import Reports from './components/Reports';
 import Safe from './components/Safe';
-import { Vault } from 'lucide-react';
+import { Vault, BookOpen } from 'lucide-react';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || '';
@@ -26,12 +27,13 @@ const hasValidSupabase = Boolean(SUPABASE_URL) && Boolean(SUPABASE_ANON_KEY);
 
 function Navigation() {
   const location = useLocation();
-  const { speak } = useTTS();
+  const { speak, speakOnClick } = useTTS();
   const isFirstMount = useRef(true);
 
   const navItems = [
     { path: '/', label: 'Inicio', icon: Home, description: 'Pantalla principal' },
     { path: '/miembros', label: 'Miembros', icon: Users, description: 'Gestionar personas' },
+    { path: '/directorio', label: 'Directorio', icon: BookOpen, description: 'Explorar negocios y favores' },
     { path: '/reuniones', label: 'Reuniones', icon: Calendar, description: 'Actividades y eventos' },
     { path: '/asistencias', label: 'Asistencia', icon: CheckSquare, description: 'Pasar lista' },
     { path: '/pagos', label: 'Pagos', icon: CreditCard, description: 'Cuotas y donaciones' },
@@ -61,6 +63,7 @@ function Navigation() {
           <Link
             key={item.path}
             to={item.path}
+            onClick={() => speakOnClick(`Abriendo ${item.label}. ${item.description}`, () => {})}
             className={`flex flex-col items-center p-2 rounded-2xl transition-all duration-200 ${
               isActive 
                 ? 'text-blue-600 bg-blue-50 shadow-sm scale-105' 
@@ -79,12 +82,17 @@ function Navigation() {
 }
 
 export default function App() {
+  const { speak, speakOnClick } = useTTS();
+
   return (
     <CajaProvider>
       <Router>
         <div className="min-h-screen bg-gray-50 pb-24 md:pb-0 md:pl-24">
           <header className="bg-white/80 backdrop-blur-lg border-b border-gray-100 px-6 py-4 flex justify-between items-center sticky top-0 z-40">
-            <div className="flex items-center gap-3">
+            <div 
+              className="flex items-center gap-3 cursor-pointer"
+              onClick={() => speakOnClick('Mi Cajita. Tu aplicación de gestión financiera comunitaria.', () => {})}
+            >
               <img 
                 src="/src/components/miCAJIAAA.png" 
                 alt="MiCajita Logo" 
@@ -93,7 +101,10 @@ export default function App() {
               <h1 className="text-xl font-bold text-gray-900 tracking-tight">MiCajita</h1>
             </div>
             <button 
-              onClick={() => window.speechSynthesis.cancel()}
+              onClick={() => {
+                window.speechSynthesis.cancel();
+                speak('Voz detenida');
+              }}
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
               title="Detener voz"
             >
@@ -105,6 +116,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/miembros" element={<Members />} />
+              <Route path="/directorio" element={<Directory />} />
               <Route path="/reuniones" element={<Meetings />} />
               <Route path="/asistencias" element={<Attendance />} />
               <Route path="/pagos" element={<Payments />} />

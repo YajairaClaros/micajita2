@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { MOCK_MIEMBROS, MOCK_REUNIONES, MOCK_ASISTENCIAS, Miembro, Reunion, Asistencia } from '../data/mockData';
 import { useTTS } from '../hooks/useTTS';
 import { CheckSquare, Volume2, CheckCircle2, XCircle, Users, Calendar } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -13,7 +13,7 @@ export default function Attendance() {
   const [asistencias, setAsistencias] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-  const { speak } = useTTS();
+  const { speak, speakOnClick } = useTTS();
 
   useEffect(() => {
     fetchInitialData();
@@ -75,9 +75,8 @@ export default function Attendance() {
           <select
             value={selectedReunion}
             onChange={(e) => {
-              setSelectedReunion(e.target.value);
               const r = reuniones.find(r => r.id === e.target.value);
-              speak(`Cambiando a reunión: ${r?.titulo}`);
+              speakOnClick(`Cambiando a reunión: ${r?.titulo}`, () => setSelectedReunion(e.target.value));
             }}
             className="bg-transparent border-none outline-none font-medium text-gray-700 pr-8"
           >
@@ -125,7 +124,7 @@ export default function Attendance() {
                 }`}
               >
                 <button
-                  onClick={() => toggleAttendance(m.id, isPresent)}
+                  onClick={() => speakOnClick(`${m.nombre} marcado como ${!isPresent ? 'presente' : 'ausente'}`, () => toggleAttendance(m.id, isPresent))}
                   className={`relative w-20 h-20 rounded-3xl overflow-hidden border-4 transition-all ${
                     isPresent ? 'border-emerald-500 scale-105 shadow-md' : 'border-transparent opacity-60 grayscale'
                   }`}
@@ -151,7 +150,7 @@ export default function Attendance() {
                 </div>
 
                 <button
-                  onClick={() => handleListenRow(m)}
+                  onClick={() => speakOnClick(`Escuchar estado de ${m.nombre}`, () => handleListenRow(m))}
                   className="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                 >
                   <Volume2 size={16} />

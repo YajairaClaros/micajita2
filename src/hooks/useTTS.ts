@@ -14,5 +14,10 @@ export function useTTS() {
     window.speechSynthesis.speak(utterance);
   }, []);
 
-  return { speak };
+  const speakOnClick = useCallback((text: string, callback?: () => void) => {
+    speak(text);
+    if (callback) callback();
+  }, [speak]);
+
+  return { speak, speakOnClick };
 }

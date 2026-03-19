@@ -5,6 +5,9 @@ export interface Miembro {
   email: string;
   activo: boolean;
   foto: string;
+  negocio: string;
+  estilo_vida: string;
+  referido_por: string | null; // ID of the member who referred them, or null if original
   created_at: string;
 }
 
@@ -36,11 +39,66 @@ export interface Pago {
 }
 
 export const MOCK_MIEMBROS: Miembro[] = [
-  { id: '1', nombre: 'Juan Pérez', telefono: '555-0101', email: 'juan@example.com', activo: true, foto: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg', created_at: new Date().toISOString() },
-  { id: '2', nombre: 'María García', telefono: '555-0102', email: 'maria@example.com', activo: true, foto: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg', created_at: new Date().toISOString() },
-  { id: '3', nombre: 'Carlos López', telefono: '555-0103', email: 'carlos@example.com', activo: true, foto: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg', created_at: new Date().toISOString() },
-  { id: '4', nombre: 'Ana Martínez', telefono: '555-0104', email: 'ana@example.com', activo: true, foto: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg', created_at: new Date().toISOString() },
-  { id: '5', nombre: 'Luis Rodríguez', telefono: '555-0105', email: 'luis@example.com', activo: false, foto: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg', created_at: new Date().toISOString() },
+  { 
+    id: '1', 
+    nombre: 'Juan Pérez', 
+    telefono: '555-0101', 
+    email: 'juan@example.com', 
+    activo: true, 
+    foto: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg', 
+    negocio: 'Planta frijoles y maíz de temporal',
+    estilo_vida: 'Le gusta la pesca y madrugar para trabajar el campo',
+    referido_por: null,
+    created_at: new Date().toISOString() 
+  },
+  { 
+    id: '2', 
+    nombre: 'María García', 
+    telefono: '555-0102', 
+    email: 'maria@example.com', 
+    activo: true, 
+    foto: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg', 
+    negocio: 'Venta de comida corrida y antojitos',
+    estilo_vida: 'Participa en el coro de la iglesia y hace yoga',
+    referido_por: '1',
+    created_at: new Date().toISOString() 
+  },
+  { 
+    id: '3', 
+    nombre: 'Carlos López', 
+    telefono: '555-0103', 
+    email: 'carlos@example.com', 
+    activo: true, 
+    foto: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg', 
+    negocio: 'Carpintería y reparación de muebles',
+    estilo_vida: 'Aficionado al fútbol y coleccionista de herramientas antiguas',
+    referido_por: null,
+    created_at: new Date().toISOString() 
+  },
+  { 
+    id: '4', 
+    nombre: 'Ana Martínez', 
+    telefono: '555-0104', 
+    email: 'ana@example.com', 
+    activo: true, 
+    foto: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg', 
+    negocio: 'Costura y arreglos de ropa',
+    estilo_vida: 'Amante de las plantas de sombra y la lectura',
+    referido_por: '2',
+    created_at: new Date().toISOString() 
+  },
+  { 
+    id: '5', 
+    nombre: 'Luis Rodríguez', 
+    telefono: '555-0105', 
+    email: 'luis@example.com', 
+    activo: false, 
+    foto: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg', 
+    negocio: 'Mecánico automotriz',
+    estilo_vida: 'Le apasionan las carreras de caballos',
+    referido_por: '3',
+    created_at: new Date().toISOString() 
+  },
 ];
 
 export const MOCK_REUNIONES: Reunion[] = [

@@ -5,19 +5,21 @@ import {
   CheckSquare, 
   CreditCard, 
   BarChart3,
-  Vault
+  Vault,
+  BookOpen
 } from 'lucide-react';
 import { useTTS } from '../hooks/useTTS';
 import { useCaja } from '../context/CajaContext';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { speak } = useTTS();
+  const { speak, speakOnClick } = useTTS();
   const { balance } = useCaja();
 
   const menuItems = [
     { path: '/miembros', label: 'Miembros', icon: Users, color: 'bg-blue-500', description: 'Gestionar personas' },
+    { path: '/directorio', label: 'Directorio', icon: BookOpen, color: 'bg-rose-500', description: 'Negocios y favores' },
     { path: '/reuniones', label: 'Reuniones', icon: Calendar, color: 'bg-purple-500', description: 'Actividades y eventos' },
     { path: '/asistencias', label: 'Asistencia', icon: CheckSquare, color: 'bg-emerald-500', description: 'Pasar lista' },
     { path: '/pagos', label: 'Pagos', icon: CreditCard, color: 'bg-orange-500', description: 'Cuotas y donaciones' },
@@ -26,7 +28,7 @@ export default function Dashboard() {
   ];
 
   const handleCardClick = (item: typeof menuItems[0]) => {
-    navigate(item.path);
+    speakOnClick(`Abriendo ${item.label}. ${item.description}`, () => navigate(item.path));
   };
 
   return (
